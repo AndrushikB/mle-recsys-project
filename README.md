@@ -62,20 +62,20 @@ wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/d
 
 Перейдите в директорию 'rec_service'
 
-''' cd rec_service '''
+``` cd rec_service ```
 
 Для работы сервиса рекомендаций необходимы Feature store и Event store (запуск производить из двух разных терминалов, на двух разных портах)
 
-'''
+```
 uvicorn features_service:app --port 8010
 uvicorn events_service:app --port 8020
-'''
+```
 
 Код для запуска сервиса рекомендаций в новом терминале:
 
-'''
+```
 uvicorn recommendation_service:app
-'''
+```
 
 # Инструкции для тестирования сервиса
 
@@ -83,8 +83,8 @@ uvicorn recommendation_service:app
 
 Находясь в директории 'rec_service' запустите тест:
 
-'''
+```
 python3 test_service.py
-'''
+```
 
 Повторный запуск теста изменит рекомендации (в ходе теста к одному и тому же пользователю добавляется онлайн история)
