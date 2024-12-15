@@ -68,6 +68,8 @@ wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/d
 
 ```
 uvicorn features_service:app --port 8010
+```
+```
 uvicorn events_service:app --port 8020
 ```
 
