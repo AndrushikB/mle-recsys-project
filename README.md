@@ -61,9 +61,9 @@ wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/d
 Код сервиса рекомендаций находится по пути `rec_service/recommendations_service.py`.
 
 Перейдите в директорию `rec_service`
-
-`cd rec_service`
-
+```
+cd rec_service
+```
 Для работы сервиса рекомендаций необходимы Feature store и Event store (запуск производить из двух разных терминалов, на двух разных портах)
 
 ```
