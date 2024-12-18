@@ -1,4 +1,7 @@
+import logging
 from fastapi import FastAPI
+
+logger = logging.getLogger("uvicorn.error")
 
 class EventStore:
 
@@ -24,6 +27,7 @@ class EventStore:
         try:
             user_events = self.events[user_id][: k]
         except KeyError:
+            logger.error(f"No recommendations found for user: {user_id}")
             user_events = []
 
         return user_events
@@ -47,6 +51,7 @@ async def put(user_id: int, item_id: int):
 async def get(user_id: int, k: int = 10):
     """
     Возвращает список последних k событий для пользователя user_id
+    при наличии истории недавних взаимодействий (k =< len(user_events))
     """
 
     events = events_store.get(user_id, k)

@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import logging
+from constants import events_store_url, recommendations_url
 
 # создадим логгер
 logger = logging.getLogger("test_service")
@@ -11,9 +12,6 @@ file_handler = logging.FileHandler("test_service.log", mode='w')
 logger.setLevel(logging.INFO)
 logger.addHandler(stream_handler)
 logger.addHandler(file_handler)
-
-recommendations_url = "http://127.0.0.1:8000"
-events_store_url = "http://127.0.0.1:8020"
 
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
@@ -39,38 +37,43 @@ params_3 = {"user_id": 1374582, 'k': 5}
 
 resp_online = requests.post(recommendations_url + "/recommendations", headers=headers, params=params_3)
 
-recs_cold = resp_cold.json()["recs"]
-recs_personal = resp_personal.json()["recs"]
-recs_online = resp_online.json()["recs"]
+if resp.status_code == 200:
 
-print(recs_cold)
-print(recs_personal)
-print(recs_online) 
+    recs_cold = resp_cold.json()["recs"]
+    recs_personal = resp_personal.json()["recs"]
+    recs_online = resp_online.json()["recs"]
 
-# загрузим данные для получения названия треков
-items = pd.read_parquet("/home/mle-user/mle-recsys-project/items.parquet")
+    print(recs_cold)
+    print(recs_personal)
+    print(recs_online) 
 
-def display_items(item_ids):
-    """
-    Отображает id треков в названия
-    """
+    # загрузим данные для получения названия треков
+    items = pd.read_parquet("/home/mle-user/mle-recsys-project/items.parquet")
 
-    item_columns_to_use = ["item_id", "name"]
-    
-    items_selected = items.query("item_id in @item_ids")[item_columns_to_use]
-    items_selected = items_selected.set_index("item_id").reindex(item_ids)
-    items_selected = items_selected.reset_index()
-    
-    return items_selected
+    def display_items(item_ids):
+        """
+        Отображает id треков в названия
+        """
 
-logger.info(f"Холодный пользователь: \n\
-{display_items(recs_cold)}")
+        item_columns_to_use = ["item_id", "name"]
+        
+        items_selected = items.query("item_id in @item_ids")[item_columns_to_use]
+        items_selected = items_selected.set_index("item_id").reindex(item_ids)
+        items_selected = items_selected.reset_index()
+        
+        return items_selected
 
-logger.info(f"Персональные Без онлайн истории: \n\
-{display_items(recs_personal)}")
+    logger.info(f"Холодный пользователь: \n\
+    {display_items(recs_cold)}")
 
-logger.info(f"Онлайн-события: \n\
-{display_items(event_item_ids)}")
+    logger.info(f"Персональные Без онлайн истории: \n\
+    {display_items(recs_personal)}")
 
-logger.info(f"Персональные с онлайн историей: \n\
-{display_items(recs_online)}")
+    logger.info(f"Онлайн-события: \n\
+    {display_items(event_item_ids)}")
+
+    logger.info(f"Персональные с онлайн историей: \n\
+    {display_items(recs_online)}")
+
+else:
+    logger.info(f"Internal Server Error, status code: {resp.status_code}")

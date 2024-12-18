@@ -17,7 +17,7 @@ class SimilarItems:
         Загружаем данные из файла
         """
 
-        logger.info(f"Loading data, type: {type}")
+        logger.info(f"Loading data")
         self._similar_items = pd.read_parquet(path, **kwargs)
         self._similar_items = self._similar_items.set_index("item_id_1")
         logger.info(f"Loaded")
@@ -30,7 +30,7 @@ class SimilarItems:
             i2i = self._similar_items.loc[item_id].head(k)
             i2i = i2i[["item_id_2", "score"]].to_dict(orient="list")
         except KeyError:
-            logger.error("No recommendations found")
+            logger.error(f"No recommendations found for item: {item_id}")
             i2i = {"item_id_2": [], "score": {}}
 
         return i2i

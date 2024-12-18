@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import pandas as pd
 import requests
+from constants import events_store_url, features_store_url
 
 class Recommendations:
 
@@ -14,15 +15,15 @@ class Recommendations:
             "request_default_count": 0,
         }
 
-    def load(self, type, path, **kwargs):
+    def load(self, rec_type, path, **kwargs):
         """
         Загружает рекомендации из файла
         """
 
-        logger.info(f"Loading recommendations, type: {type}")
-        self._recs[type] = pd.read_parquet(path, **kwargs)
-        if type == "personal":
-            self._recs[type] = self._recs[type].set_index("user_id")
+        logger.info(f"Loading recommendations, type: {rec_type}")
+        self._recs[rec_type] = pd.read_parquet(path, **kwargs)
+        if rec_type == "personal":
+            self._recs[rec_type] = self._recs[rec_type].set_index("user_id")
         logger.info(f"Loaded")
 
     def get(self, user_id: int, k: int=3):
@@ -51,8 +52,6 @@ class Recommendations:
 
 logger = logging.getLogger("uvicorn.error")
 rec_store = Recommendations()
-events_store_url = "http://127.0.0.1:8020"
-features_store_url = "http://127.0.0.1:8010"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -113,13 +112,16 @@ async def recommendations_online(user_id: int, k: int = 100):
     # получаем список айтемов, похожих на последние три, с которыми взаимодействовал пользователь
     items = []
     scores = []
-    for item_id in events:
-        # для каждого item_id получаем список похожих в item_similar_items
-        params = {"item_id": item_id, "k": 5}
-        item_similar_items = requests.post(features_store_url +"/similar_items", headers=headers, params=params)
-        item_similar_items = item_similar_items.json()
-        items += item_similar_items["item_id_2"]
-        scores += item_similar_items["score"]
+    try:
+        for item_id in events:
+            # для каждого item_id получаем список похожих в item_similar_items
+            params = {"item_id": item_id, "k": 5}
+            item_similar_items = requests.post(features_store_url +"/similar_items", headers=headers, params=params)
+            item_similar_items = item_similar_items.json()
+            items += item_similar_items["item_id_2"]
+            scores += item_similar_items["score"]
+    except Exception as e:
+        logger.error(f"Wrong FeatureStore url \n Error: {e}")
     # сортируем похожие объекты по scores в убывающем порядке
     # для старта это приемлемый подход
     combined = list(zip(items, scores))
