@@ -17,13 +17,13 @@ git clone https://github.com/AndrushikB/mle-recsys-project.git
 python3.10 -m venv .venv_recsys-project
 ```
 
-После его инициализации следующей командой
+После, инициализируйте его следующей командой:
 
 ```
 source .venv_recsys-project/bin/activate
 ```
 
-установите в него необходимые Python-пакеты следующей командой
+установите в него необходимые Python-пакеты следующей командой:
 
 ```
 pip install -r requirements.txt
@@ -31,23 +31,9 @@ pip install -r requirements.txt
 
 ### Скачайте файлы с данными
 
-Для работы и тестирования сервиса понадобится четыре файла с данными:
-- [recommendations.parquet](https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/recommendations.parquet)
-- [top_popular.parquet](https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/top_popular.parquet)
-- [similar.parquet](https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/similar.parquet)
-- [items.parquet](https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/data/items.parquet)
+Для работы и тестирования сервиса понадобится четыре файла с данными. Для их загрузки подготовлен ноутбук в корневой директории `download_files.ipynb`.
 
-Скачайте их в директорию локального репозитория. Для удобства вы можете воспользоваться командой wget:
-
-```
-wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/recommendations.parquet
-
-wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/top_popular.parquet
-
-wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/recommendations/similar.parquet
-
-wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/data/items.parquet
-```
+Спомощью этого ноутбука скачайте необходимые файлы в директорию локального репозитория.
 
 # Расчёт рекомендаций
 
@@ -57,11 +43,11 @@ wget https://storage.yandexcloud.net/s3-student-mle-20240827-f58c68b5ea/recsys/d
 
 Код сервиса рекомендаций находится по пути `rec_service/recommendations_service.py`.
 
-Перейдите в директорию `rec_service`
+Перейдите в директорию `rec_service`:
 ```
 cd rec_service
 ```
-Для работы сервиса рекомендаций необходимы Feature store и Event store (запуск производить из двух разных терминалов, на двух разных портах)
+Для работы сервиса рекомендаций необходимы Feature store и Event store (запуск производить из двух разных терминалов, на двух разных портах):
 
 ```
 uvicorn features_service:app --port 8010
@@ -86,4 +72,4 @@ uvicorn recommendation_service:app
 python3 test_service.py
 ```
 
-Повторный запуск теста изменит рекомендации (в ходе теста к одному и тому же пользователю добавляется онлайн история)
+Повторный запуск теста изменит рекомендации (в ходе теста к одному и тому же пользователю добавляется онлайн история).
